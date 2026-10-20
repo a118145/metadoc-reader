@@ -172,9 +172,14 @@ For each section the reader determines a **resolved start** line, then verifies 
 1. **Symbol.** If `symbol` is present and the language's document symbol provider reports matching
    symbols, take the one whose start line is closest to the hint's `start`. Matching is by exact
    qualified name (the provider's nested symbol names joined with `.`, with `::` converted to `.`
-   and parameter lists/template arguments removed); if there is none, a provider name that ends with
-   `.<symbol>`; if there is none, the longest provider name that `<symbol>` ends with (after a `.`).
-   The resolved start is that symbol's first line as reported by the provider.
+   and parameter lists/template arguments removed). If there is none, a provider name matches when
+   one of the two names ends with `.` followed by the other (one side omits a leading namespace or
+   module, e.g. `A.f` and `ns.A.f`), provided the shorter name still contains a `.` and exactly one
+   distinct provider name matches this way. A bare anchor such as `update` therefore only matches a
+   bare symbol `update`, never a method `KalmanFilter.update`, and `KalmanFilter.update` never
+   matches a free function `update`. When no symbol matches, or the match is ambiguous, the section
+   is placed by its line hint (step 2) and reported as "symbol not found". The resolved start is
+   the matched symbol's first line as reported by the provider.
 2. **Line hint.** Otherwise, if `lines` is valid and `start` is within the file, the resolved start
    is `start`.
 3. Otherwise the section is **unresolved**.

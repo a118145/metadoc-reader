@@ -77,7 +77,7 @@ function statusBadges(block: DocBlock): HTMLElement[] {
   } else if (block.status === 'unverified') {
     badges.push(element('span', 'badge badge-unverified', 'unverified'));
   }
-  if (block.location === 'lines') {
+  if (block.symbol && block.location === 'lines') {
     badges.push(element('span', 'badge badge-lines', 'line hint'));
   } else if (block.location === 'unresolved') {
     badges.push(element('span', 'badge badge-unresolved', 'not placed'));

@@ -72,6 +72,19 @@ describe('resolveSection', () => {
     assert.match(result.messages[0], /"missing" not found/);
   });
 
+  it('places a section by line hint when only a same-named symbol in another scope exists', () => {
+    const renamed = resolveSection(section({ ...areaSection, symbol: 'Shape.area' }), prepareSource(original), symbolsOf(0));
+    assert.equal(renamed.location, 'lines');
+    assert.equal(renamed.anchorLine, 3);
+    assert.match(renamed.messages[0], /"Shape.area" not found/);
+
+    const deleted = resolveSection(areaSection, prepareSource(original), [
+      { qualifiedName: 'Shape.area', startLine: 4, endLine: 5 },
+    ]);
+    assert.equal(deleted.location, 'lines');
+    assert.match(deleted.messages[0], /"area" not found/);
+  });
+
   it('marks a section stale when its code changed', () => {
     const edited = [...original];
     edited[7] = '    return area(r) * h * 1.0';

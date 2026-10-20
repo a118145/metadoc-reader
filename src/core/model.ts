@@ -118,7 +118,7 @@ export function buildViewModel(input: ViewModelInput): ViewModel {
       unverified: count((entry) => entry.status === 'unverified'),
       unresolved: count((entry) => entry.location === 'unresolved'),
       bySymbol: count((entry) => entry.location === 'symbol'),
-      byLines: count((entry) => entry.location === 'lines'),
+      byLines: count((entry) => Boolean(entry.section.symbol) && entry.location === 'lines'),
     },
   };
 }

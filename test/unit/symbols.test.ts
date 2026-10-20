@@ -48,10 +48,37 @@ describe('findSymbolCandidates', () => {
     assert.deepEqual(findSymbolCandidates(symbols, 'f').map((symbol) => symbol.startLine), [30]);
   });
 
-  it('falls back to dot-boundary suffix matches in either direction', () => {
+  it('matches a qualified anchor when one side omits a leading namespace', () => {
     assert.deepEqual(findSymbolCandidates(symbols, 'A.f').map((symbol) => symbol.startLine), [3, 7]);
     assert.deepEqual(findSymbolCandidates(symbols, 'outer.ns.A.f').map((symbol) => symbol.startLine), [3, 7]);
-    assert.deepEqual(findSymbolCandidates(symbols, 'B.f'), [{ qualifiedName: 'f', startLine: 30, endLine: 31 }]);
     assert.deepEqual(findSymbolCandidates(symbols, 'xf'), []);
+  });
+
+  it('never resolves a qualified anchor to a free function of the same name', () => {
+    assert.deepEqual(findSymbolCandidates(symbols, 'B.f'), []);
+  });
+
+  it('rejects ambiguous suffix matches', () => {
+    const twoScopes = flattenSymbols([
+      { name: 'one', startLine: 1, endLine: 10, children: [{ name: 'A::f', startLine: 2, endLine: 3 }] },
+      { name: 'two', startLine: 11, endLine: 20, children: [{ name: 'A::f', startLine: 12, endLine: 13 }] },
+    ]);
+    assert.deepEqual(findSymbolCandidates(twoScopes, 'A.f'), []);
+    assert.deepEqual(findSymbolCandidates(twoScopes, 'one.A.f').map((symbol) => symbol.startLine), [2]);
+  });
+
+  it('does not move a renamed method onto a same-named top-level function', () => {
+    const renamed = flattenSymbols([
+      { name: 'KalmanFilter', startLine: 10, endLine: 60, children: [{ name: 'correct', startLine: 41, endLine: 54 }] },
+      { name: 'update', startLine: 70, endLine: 75 },
+    ]);
+    assert.deepEqual(findSymbolCandidates(renamed, 'KalmanFilter.update'), []);
+  });
+
+  it('does not move a deleted top-level function onto a same-named method', () => {
+    const deleted = flattenSymbols([
+      { name: 'KalmanFilter', startLine: 10, endLine: 60, children: [{ name: 'update', startLine: 41, endLine: 54 }] },
+    ]);
+    assert.deepEqual(findSymbolCandidates(deleted, 'update'), []);
   });
 });

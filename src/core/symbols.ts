@@ -84,21 +84,21 @@ export function flattenSymbols(nodes: readonly SymbolNode[], prefix = ''): FlatS
 }
 
 /**
- * Symbols matching an anchor's `symbol`, best tier first: exact qualified-name matches; else
- * provider names that end with the anchor name on a dot boundary (the provider reports an enclosing
- * scope the anchor omitted); else the longest provider names the anchor name ends with (the provider
- * omits a scope the anchor has). Several results are overloads; the caller picks by line hint.
+ * Symbols matching an anchor's `symbol`. Exact qualified-name matches win. Otherwise one name may be
+ * a dot-boundary suffix of the other (one side omits a leading namespace or module), but only when
+ * the shorter of the two still has a scope (contains a `.`) and exactly one qualified name matches;
+ * anything else returns no candidates so the caller falls back to the line hint. Several results are
+ * overloads of one name; the caller picks by line hint.
  */
 export function findSymbolCandidates(symbols: readonly FlatSymbol[], symbol: string): FlatSymbol[] {
   const exact = symbols.filter((candidate) => candidate.qualifiedName === symbol);
   if (exact.length > 0) {
     return exact;
   }
-  const longer = symbols.filter((candidate) => candidate.qualifiedName.endsWith(`.${symbol}`));
-  if (longer.length > 0) {
-    return longer;
-  }
-  const shorter = symbols.filter((candidate) => symbol.endsWith(`.${candidate.qualifiedName}`));
-  const longest = Math.max(0, ...shorter.map((candidate) => candidate.qualifiedName.length));
-  return shorter.filter((candidate) => candidate.qualifiedName.length === longest);
+  const suffix = symbols.filter(({ qualifiedName }) => {
+    const [shorter, longer] = qualifiedName.length < symbol.length ? [qualifiedName, symbol] : [symbol, qualifiedName];
+    return shorter.includes('.') && longer.endsWith(`.${shorter}`);
+  });
+  const names = new Set(suffix.map((candidate) => candidate.qualifiedName));
+  return names.size === 1 ? suffix : [];
 }

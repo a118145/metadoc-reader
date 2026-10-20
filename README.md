@@ -68,7 +68,9 @@ This opens an Extension Development Host on the `examples/` folder.
 In the reader:
 
 - The toolbar counts sections that are up to date, stale, unverified (no valid hash), placed by
-  line hint (symbol not found or no symbol provider), or not placed. Click **stale ↓** to jump to
+  line hint because their symbol was not found (or no symbol provider is installed), or not
+  placed. Sections without a symbol (imports, a main guard) are placed by their line range and are
+  not counted as a fallback. Click **stale ↓** to jump to
   the next stale section.
 - Stale code is tinted, and the matching description has a warning bar that says why.
 - Click a line number or a section's `L12–40` link to open the source at that line. Click ✎ on a

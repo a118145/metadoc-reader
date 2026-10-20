@@ -110,7 +110,7 @@ for (const example of examples) {
         unverified: 0,
         unresolved: 0,
         bySymbol: parsed.sections.filter((section) => section.symbol).length,
-        byLines: parsed.sections.filter((section) => !section.symbol).length,
+        byLines: 0,
       });
       assert.equal(model.blocks[0].kind, 'overview');
       assert.deepEqual(model.rows[0].blocks, [0]);
