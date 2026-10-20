@@ -77,9 +77,10 @@ In the reader:
   section to open the metadoc at that section.
 
 Symbol resolution works for every language that has a document symbol provider installed, for
-example Pylance/Python for `.py` and clangd or the C/C++ extension for `.cpp`. Without one, the
-reader places sections by their line hints. It still finds code that moved by up to 20 lines,
-because it searches nearby lines for the hashed span.
+example Pylance/Python for `.py` and clangd for `.cpp`. The Microsoft C/C++ extension (cpptools)
+reports out-of-class method definitions without their class, so those sections are placed by line
+hint. Without a provider, the reader places sections by their line hints. It still finds code that
+moved by up to 20 lines, because it searches nearby lines for the hashed span.
 
 Pairing: `foo.metadoc` describes the file named in its header (`source="foo.cpp"`). When
 `foo.cpp` and `foo.hpp` both need a metadoc, the second one is named `foo.hpp.metadoc`. See
