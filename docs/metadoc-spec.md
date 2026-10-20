@@ -178,9 +178,9 @@ For each section the reader determines a **resolved start** line, then verifies 
    provider name matches this way. A provider name is never matched when it is shorter than the
    anchor: `Model.Config.load` does not match a top-level `Config.load`, and `KalmanFilter.update`
    never matches a free function `update`. A bare anchor such as `update` only matches a bare
-   symbol `update`, never a method `KalmanFilter.update`. When no symbol matches, or the match is ambiguous, the section
-   is placed by its line hint (step 2) and reported as "symbol not found". The resolved start is
-   the matched symbol's first line as reported by the provider.
+   symbol `update`, never a method `KalmanFilter.update`. When no symbol matches, or the match is
+   ambiguous, the section is placed by its line hint (step 2) and reported as "symbol not found".
+   The resolved start is the matched symbol's first line as reported by the provider.
 2. **Line hint.** Otherwise, if `lines` is valid and `start` is within the file, the resolved start
    is `start`.
 3. Otherwise the section is **unresolved**.
