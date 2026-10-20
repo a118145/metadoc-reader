@@ -84,21 +84,21 @@ export function flattenSymbols(nodes: readonly SymbolNode[], prefix = ''): FlatS
 }
 
 /**
- * Symbols matching an anchor's `symbol`. Exact qualified-name matches win. Otherwise one name may be
- * a dot-boundary suffix of the other (one side omits a leading namespace or module), but only when
- * the shorter of the two still has a scope (contains a `.`) and exactly one qualified name matches;
- * anything else returns no candidates so the caller falls back to the line hint. Several results are
- * overloads of one name; the caller picks by line hint.
+ * Symbols matching an anchor's `symbol`. Exact qualified-name matches win. Otherwise a provider name
+ * that ends with `.<symbol>` matches (the anchor omits a leading namespace or module), but only when
+ * the anchor has a scope (contains a `.`) and exactly one qualified name matches; anything else
+ * returns no candidates so the caller falls back to the line hint. Several results are overloads of
+ * one name; the caller picks by line hint.
  */
 export function findSymbolCandidates(symbols: readonly FlatSymbol[], symbol: string): FlatSymbol[] {
   const exact = symbols.filter((candidate) => candidate.qualifiedName === symbol);
   if (exact.length > 0) {
     return exact;
   }
-  const suffix = symbols.filter(({ qualifiedName }) => {
-    const [shorter, longer] = qualifiedName.length < symbol.length ? [qualifiedName, symbol] : [symbol, qualifiedName];
-    return shorter.includes('.') && longer.endsWith(`.${shorter}`);
-  });
+  if (!symbol.includes('.')) {
+    return [];
+  }
+  const suffix = symbols.filter((candidate) => candidate.qualifiedName.endsWith(`.${symbol}`));
   const names = new Set(suffix.map((candidate) => candidate.qualifiedName));
   return names.size === 1 ? suffix : [];
 }

@@ -85,6 +85,14 @@ describe('resolveSection', () => {
     assert.match(deleted.messages[0], /"area" not found/);
   });
 
+  it('places a section by line hint when the provider omits a scope the anchor names', () => {
+    const result = resolveSection(section({ ...areaSection, symbol: 'geometry.area' }), prepareSource(original), symbolsOf(0));
+    assert.equal(result.location, 'lines');
+    assert.equal(result.status, 'fresh');
+    assert.equal(result.anchorLine, 3);
+    assert.match(result.messages[0], /"geometry.area" not found/);
+  });
+
   it('marks a section stale when its code changed', () => {
     const edited = [...original];
     edited[7] = '    return area(r) * h * 1.0';

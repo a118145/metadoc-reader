@@ -48,10 +48,21 @@ describe('findSymbolCandidates', () => {
     assert.deepEqual(findSymbolCandidates(symbols, 'f').map((symbol) => symbol.startLine), [30]);
   });
 
-  it('matches a qualified anchor when one side omits a leading namespace', () => {
+  it('matches a qualified anchor that omits a leading namespace', () => {
     assert.deepEqual(findSymbolCandidates(symbols, 'A.f').map((symbol) => symbol.startLine), [3, 7]);
-    assert.deepEqual(findSymbolCandidates(symbols, 'outer.ns.A.f').map((symbol) => symbol.startLine), [3, 7]);
     assert.deepEqual(findSymbolCandidates(symbols, 'xf'), []);
+  });
+
+  it('does not match when the provider omits a scope the anchor names', () => {
+    assert.deepEqual(findSymbolCandidates(symbols, 'outer.ns.A.f'), []);
+  });
+
+  it('does not move a method of a removed nested class onto a same-named top-level class', () => {
+    const removedNested = flattenSymbols([
+      { name: 'Model', startLine: 1, endLine: 10, children: [{ name: 'fit', startLine: 2, endLine: 5 }] },
+      { name: 'Config', startLine: 12, endLine: 20, children: [{ name: 'load', startLine: 13, endLine: 19 }] },
+    ]);
+    assert.deepEqual(findSymbolCandidates(removedNested, 'Model.Config.load'), []);
   });
 
   it('never resolves a qualified anchor to a free function of the same name', () => {
