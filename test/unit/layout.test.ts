@@ -1,6 +1,6 @@
 import * as assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { buildRows, computeGaps } from '../../src/core/layout';
+import { buildRows, computeGaps, nextJumpTarget } from '../../src/core/layout';
 
 describe('buildRows', () => {
   it('starts a row at every anchor and gives leading code its own row', () => {
@@ -93,5 +93,19 @@ describe('computeGaps', () => {
       docTop += height.doc + gaps[index].doc;
     });
     assert.equal(codeTop, docTop);
+  });
+});
+
+describe('nextJumpTarget', () => {
+  it('moves past the target that the previous jump landed on', () => {
+    // Toolbar 32 px + 8 px landing margin: the first stale section sits at the landing position.
+    assert.equal(nextJumpTarget([40, 885], 40), 1);
+    assert.equal(nextJumpTarget([40.5, 885], 40), 1);
+  });
+
+  it('picks the first target below the landing position and wraps after the last', () => {
+    assert.equal(nextJumpTarget([-300, 120, 900], 40), 1);
+    assert.equal(nextJumpTarget([-900, 40], 40), 0);
+    assert.equal(nextJumpTarget([], 40), -1);
   });
 });

@@ -1,4 +1,4 @@
-import { computeGaps } from '../core/layout';
+import { computeGaps, nextJumpTarget } from '../core/layout';
 import type { DocBlock, ViewModel } from '../core/model';
 
 interface VsCodeApi {
@@ -163,12 +163,11 @@ function renderToolbar(model: ViewModel): void {
 }
 
 function jumpToNext(selector: string): void {
-  const offset = toolbar.getBoundingClientRect().height;
+  const landing = toolbar.getBoundingClientRect().height + 8;
   const targets = [...document.querySelectorAll<HTMLElement>(selector)];
-  const next =
-    targets.find((target) => target.getBoundingClientRect().top > offset + 2) ?? targets[0];
+  const next = targets[nextJumpTarget(targets.map((target) => target.getBoundingClientRect().top), landing)];
   if (next) {
-    window.scrollTo({ top: window.scrollY + next.getBoundingClientRect().top - offset - 8, behavior: 'smooth' });
+    window.scrollTo({ top: window.scrollY + next.getBoundingClientRect().top - landing, behavior: 'smooth' });
   }
 }
 
