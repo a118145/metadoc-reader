@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Metadoc",
+  "scopeName": "text.metadoc",
+  "patterns": [
+    { "include": "#anchor" },
+    { "include": "text.html.markdown" }
+  ],
+  "repository": {
+    "anchor": {
+      "match": "^\\s*(<!--)\\s*(metadoc:[A-Za-z0-9_-]*)(.*?)(-->)\\s*$",
+      "captures": {
+        "1": { "name": "punctuation.definition.comment.metadoc" },
+        "2": { "name": "keyword.control.anchor.metadoc" },
+        "3": {
+          "patterns": [
+            {
+              "match": "([A-Za-z][A-Za-z0-9_-]*)\\s*(=)\\s*(\"[^\"]*\")",
+              "captures": {
+                "1": { "name": "entity.other.attribute-name.metadoc" },
+                "2": { "name": "punctuation.separator.key-value.metadoc" },
+                "3": { "name": "string.quoted.double.metadoc" }
+              }
+            }
+          ]
+        },
+        "4": { "name": "punctuation.definition.comment.metadoc" }
+      }
+    }
+  }
+}

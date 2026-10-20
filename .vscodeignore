@@ -1,0 +1,9 @@
+**
+!package.json
+!README.md
+!CHANGELOG.md
+!LICENSE
+!dist/**
+!media/**
+!syntaxes/**
+!docs/metadoc-spec.md
