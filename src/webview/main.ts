@@ -165,7 +165,8 @@ function renderToolbar(model: ViewModel): void {
 function jumpToNext(selector: string): void {
   const landing = toolbar.getBoundingClientRect().height + 8;
   const targets = [...document.querySelectorAll<HTMLElement>(selector)];
-  const next = targets[nextJumpTarget(targets.map((target) => target.getBoundingClientRect().top), landing)];
+  const atEnd = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+  const next = targets[nextJumpTarget(targets.map((target) => target.getBoundingClientRect().top), landing, atEnd)];
   if (next) {
     window.scrollTo({ top: window.scrollY + next.getBoundingClientRect().top - landing, behavior: 'smooth' });
   }

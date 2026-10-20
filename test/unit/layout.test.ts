@@ -108,4 +108,10 @@ describe('nextJumpTarget', () => {
     assert.equal(nextJumpTarget([-900, 40], 40), 0);
     assert.equal(nextJumpTarget([], 40), -1);
   });
+
+  it('wraps to the first target when the page cannot scroll any further', () => {
+    // At the page bottom the last stale section cannot reach the landing position and stays below it.
+    assert.equal(nextJumpTarget([-1307, -462, 178], 40, true), 0);
+    assert.equal(nextJumpTarget([-1307, -462, 178], 40, false), 2);
+  });
 });
