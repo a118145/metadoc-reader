@@ -144,6 +144,31 @@ describe('resolveSection', () => {
     assert.equal(result.status, 'stale');
     assert.equal(result.anchorLine, undefined);
   });
+
+  it('says "placed by line hint" only when the line hint actually placed the section', () => {
+    const noHint = resolveSection(section({ symbol: 'gone' }), prepareSource(original), symbolsOf(0));
+    assert.equal(noHint.location, 'unresolved');
+    assert.deepEqual(noHint.messages, ['symbol "gone" not found', 'section could not be placed in the source']);
+
+    const beyondEnd = resolveSection(
+      section({ symbol: 'gone', lines: { start: 50, end: 52 }, hash: '000000000000' }),
+      prepareSource(original),
+      [],
+    );
+    assert.equal(beyondEnd.location, 'unresolved');
+    assert.equal(beyondEnd.messages[0], 'no symbols available from a symbol provider');
+    assert.ok(beyondEnd.messages.every((message) => !message.includes('placed by line hint')));
+
+    const movedIntoFile = resolveSection(
+      section({ symbol: 'gone', lines: { start: 10, end: 11 }, hash: volumeSection.hash }),
+      prepareSource(original),
+      symbolsOf(0),
+    );
+    assert.equal(movedIntoFile.location, 'lines');
+    assert.equal(movedIntoFile.status, 'fresh');
+    assert.equal(movedIntoFile.anchorLine, 7);
+    assert.deepEqual(movedIntoFile.messages, ['symbol "gone" not found; placed by line hint']);
+  });
 });
 
 describe('resolveSections', () => {

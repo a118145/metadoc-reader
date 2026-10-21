@@ -72,14 +72,11 @@ body {
   padding: 1px 8px;
   border-radius: 10px;
   border: 1px solid var(--border);
-  font: inherit;
   font-size: 0.9em;
-  color: inherit;
-  background: transparent;
 }
 
 .chip-fresh { border-color: var(--fresh); }
-.chip-stale { border-color: var(--stale); color: var(--stale); cursor: pointer; }
+.chip-stale { border-color: var(--stale); color: var(--stale); }
 .chip-unverified { border-color: var(--stale); }
 .chip-lines { border-color: var(--lines); }
 .chip-unresolved { border-color: var(--unresolved); color: var(--unresolved); }
@@ -129,7 +126,6 @@ body {
   text-align: right;
   color: var(--vscode-editorLineNumber-foreground, #858585);
   user-select: none;
-  cursor: pointer;
 }
 
 .line-text {
@@ -176,20 +172,6 @@ body {
 
 .block-meta .symbol {
   font-family: var(--code-font);
-}
-
-.block-meta a {
-  color: var(--vscode-textLink-foreground);
-  text-decoration: none;
-}
-
-.block-meta .edit {
-  margin-left: auto;
-  opacity: 0;
-}
-
-.block:hover .block-meta .edit {
-  opacity: 1;
 }
 
 .badge {

@@ -1,4 +1,4 @@
-import { computeGaps, nextJumpTarget } from '../core/layout';
+import { computeGaps } from '../core/layout';
 import type { DocBlock, ViewModel } from '../core/model';
 
 interface VsCodeApi {
@@ -101,24 +101,9 @@ function renderBlock(block: DocBlock, index: number): HTMLElement {
       meta.append(element('code', 'symbol', block.symbol));
     }
     if (block.span) {
-      const lines = element('a', 'lines', `L${block.span.start}–${block.span.end}`);
-      lines.href = '#';
-      lines.title = 'Show in source editor';
-      lines.addEventListener('click', (event) => {
-        event.preventDefault();
-        vscode.postMessage({ type: 'reveal', target: 'source', line: block.span?.start ?? 1 });
-      });
-      meta.append(lines);
+      meta.append(element('span', 'lines', `L${block.span.start}–${block.span.end}`));
     }
     meta.append(...statusBadges(block));
-    const edit = element('a', 'edit', '✎');
-    edit.href = '#';
-    edit.title = 'Open this section in the metadoc';
-    edit.addEventListener('click', (event) => {
-      event.preventDefault();
-      vscode.postMessage({ type: 'reveal', target: 'metadoc', line: block.metadocLine });
-    });
-    meta.append(edit);
     container.append(meta);
   }
   if (block.messages.length > 0 && block.status !== 'fresh') {
@@ -145,10 +130,7 @@ function renderToolbar(model: ViewModel): void {
     chips.append(element('span', 'chip chip-fresh', `${summary.fresh} up to date`));
   }
   if (summary.stale > 0) {
-    const stale = element('button', 'chip chip-stale', `${summary.stale} stale ↓`);
-    stale.title = 'Jump to the next stale section';
-    stale.addEventListener('click', () => jumpToNext('.block.status-stale'));
-    chips.append(stale);
+    chips.append(element('span', 'chip chip-stale', `${summary.stale} stale`));
   }
   if (summary.unverified > 0) {
     chips.append(element('span', 'chip chip-unverified', `${summary.unverified} unverified`));
@@ -160,16 +142,6 @@ function renderToolbar(model: ViewModel): void {
     chips.append(element('span', 'chip chip-unresolved', `${summary.unresolved} not placed`));
   }
   toolbar.append(title, chips);
-}
-
-function jumpToNext(selector: string): void {
-  const landing = toolbar.getBoundingClientRect().height + 8;
-  const targets = [...document.querySelectorAll<HTMLElement>(selector)];
-  const atEnd = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
-  const next = targets[nextJumpTarget(targets.map((target) => target.getBoundingClientRect().top), landing, atEnd)];
-  if (next) {
-    window.scrollTo({ top: window.scrollY + next.getBoundingClientRect().top - landing, behavior: 'smooth' });
-  }
 }
 
 function renderMessages(model: ViewModel): void {
@@ -211,8 +183,6 @@ function render(model: ViewModel): void {
     for (let line = row.codeStart; line <= row.codeEnd; line++) {
       const lineElement = element('div', staleLines.has(line) ? 'line stale-line' : 'line');
       const number = element('span', 'line-number', String(line));
-      number.title = 'Show in source editor';
-      number.addEventListener('click', () => vscode.postMessage({ type: 'reveal', target: 'source', line }));
       const text = element('span', 'line-text');
       text.innerHTML = model.codeLines[line - 1] || ' '; // highlight.js output is escaped HTML
       lineElement.append(number, text);

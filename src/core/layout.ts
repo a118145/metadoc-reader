@@ -66,21 +66,3 @@ export function computeGaps(heights: readonly RowHeights[]): RowHeights[] {
     return { code: height - code, doc: height - doc };
   });
 }
-
-/**
- * Index of the next target to jump to, given the viewport tops of all targets (in document order)
- * and the top a jump scrolls its target to. A target at (or within a couple of pixels of) the
- * landing position is the current one, so the first target below it is next; after the last one,
- * or when the page cannot scroll any further (`atEnd`), the jump wraps to the first. Returns -1
- * when there are no targets.
- */
-export function nextJumpTarget(tops: readonly number[], landing: number, atEnd = false): number {
-  if (tops.length === 0) {
-    return -1;
-  }
-  if (atEnd) {
-    return 0;
-  }
-  const next = tops.findIndex((top) => top > landing + 2);
-  return next === -1 ? 0 : next;
-}

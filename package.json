@@ -63,22 +63,10 @@
     },
     "languages": [
       {
-        "id": "metadoc",
-        "aliases": [
-          "Metadoc",
-          "metadoc"
-        ],
+        "id": "markdown",
         "extensions": [
           ".metadoc"
-        ],
-        "configuration": "./syntaxes/metadoc.language-configuration.json"
-      }
-    ],
-    "grammars": [
-      {
-        "language": "metadoc",
-        "scopeName": "text.metadoc",
-        "path": "./syntaxes/metadoc.tmLanguage.json"
+        ]
       }
     ]
   },
@@ -87,7 +75,7 @@
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc -p . --noEmit",
     "compile-tests": "tsc -p tsconfig.test.json",
-    "test": "npm run compile-tests && node --test \"out/test/**/*.test.js\"",
+    "test": "npm run compile-tests && cd out/test && node --test",
     "package": "npm run build && vsce package --no-dependencies",
     "vscode:prepublish": "npm run typecheck && npm run build"
   },

@@ -14,9 +14,7 @@ export interface PanelState {
 }
 
 /** Messages the webview sends to the extension. */
-type WebviewMessage =
-  | { type: 'ready' }
-  | { type: 'reveal'; target: 'source' | 'metadoc'; line: number };
+type WebviewMessage = { type: 'ready' };
 
 const REFRESH_DELAY_MS = 200;
 /** Retries while a language server has not produced symbols yet. */
@@ -102,13 +100,6 @@ export class MetadocPanel {
     if (message.type === 'ready') {
       this.ready = true;
       this.scheduleRefresh(0);
-    } else if (message.type === 'reveal') {
-      const uri = message.target === 'source' ? this.source : this.metadoc;
-      const position = new vscode.Position(Math.max(0, message.line - 1), 0);
-      void vscode.window.showTextDocument(uri, {
-        viewColumn: vscode.ViewColumn.Beside,
-        selection: new vscode.Range(position, position),
-      });
     }
   }
 

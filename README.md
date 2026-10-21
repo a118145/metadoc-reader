@@ -33,7 +33,7 @@ the hash no longer matches.
 
 ## Install
 
-Requirements: VS Code 1.85 or newer. Node.js 18+ and npm are needed only to build from source.
+Requirements: VS Code 1.85 or newer. Node.js 22+ and npm are needed only to build from source.
 
 ### From a `.vsix`
 
@@ -70,11 +70,8 @@ In the reader:
 - The toolbar counts sections that are up to date, stale, unverified (no valid hash), placed by
   line hint because their symbol was not found (or no symbol provider is installed), or not
   placed. Sections without a symbol (imports, a main guard) are placed by their line range and are
-  not counted as a fallback. Click **stale ↓** to jump to
-  the next stale section.
+  not counted as a fallback.
 - Stale code is tinted, and the matching description has a warning bar that says why.
-- Click a line number or a section's `L12–40` link to open the source at that line. Click ✎ on a
-  section to open the metadoc at that section.
 
 Symbol resolution works for every language that has a document symbol provider installed, for
 example Pylance/Python for `.py` and clangd for `.cpp`. The Microsoft C/C++ extension (cpptools)

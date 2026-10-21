@@ -57,11 +57,12 @@ export function resolveSection(
   symbols: readonly FlatSymbol[],
 ): ResolvedSection {
   const lineCount = source.normalized.length;
-  const messages: string[] = [...section.problems];
+  const notes: string[] = [];
   const hint = section.lines;
   let location: SectionLocation = 'unresolved';
   let anchorLine: number | undefined;
   let span: LineRange | undefined;
+  let fallback: string | undefined;
 
   if (section.symbol) {
     const candidates = findSymbolCandidates(symbols, section.symbol);
@@ -74,9 +75,9 @@ export function resolveSection(
       anchorLine = best.startLine;
       span = { start: best.startLine, end: best.endLine };
     } else if (symbols.length === 0) {
-      messages.push(`no symbols available from a symbol provider; placed by line hint`);
+      fallback = 'no symbols available from a symbol provider';
     } else {
-      messages.push(`symbol "${section.symbol}" not found; placed by line hint`);
+      fallback = `symbol "${section.symbol}" not found`;
     }
   }
   if (location === 'unresolved' && hint && hint.start <= lineCount) {
@@ -85,11 +86,16 @@ export function resolveSection(
     span = { start: hint.start, end: Math.min(hint.end, lineCount) };
   }
 
+  const result = (status: SectionStatus): ResolvedSection => {
+    const placement = fallback === undefined ? [] : [location === 'lines' ? `${fallback}; placed by line hint` : fallback];
+    return { section, location, status, anchorLine, span, messages: [...section.problems, ...placement, ...notes] };
+  };
+
   if (!section.hash || !hint) {
     if (location === 'unresolved') {
-      messages.push('section could not be placed in the source');
+      notes.push('section could not be placed in the source');
     }
-    return { section, location, status: 'unverified', anchorLine, span, messages };
+    return result('unverified');
   }
 
   const length = hint.end - hint.start + 1;
@@ -98,22 +104,17 @@ export function resolveSection(
       if (location === 'unresolved') {
         location = 'lines';
       }
-      return {
-        section,
-        location,
-        status: 'fresh',
-        anchorLine: start,
-        span: { start, end: start + length - 1 },
-        messages,
-      };
+      anchorLine = start;
+      span = { start, end: start + length - 1 };
+      return result('fresh');
     }
   }
 
-  messages.push('source changed since this section was written (span hash does not match)');
+  notes.push('source changed since this section was written (span hash does not match)');
   if (location === 'unresolved') {
-    messages.push(`line hint ${hint.start}-${hint.end} lies outside the source (${lineCount} lines)`);
+    notes.push(`line hint ${hint.start}-${hint.end} lies outside the source (${lineCount} lines)`);
   }
-  return { section, location, status: 'stale', anchorLine, span, messages };
+  return result('stale');
 }
 
 export function resolveSections(

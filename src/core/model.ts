@@ -22,8 +22,6 @@ export interface ViewModel {
 export interface DocBlock {
   kind: 'overview' | 'section';
   html: string;
-  /** 1-based line of the block's anchor (or first line) in the metadoc. */
-  metadocLine: number;
   symbol?: string;
   /** Line hint as written, e.g. "12-40". */
   hint?: string;
@@ -70,7 +68,6 @@ export function buildViewModel(input: ViewModelInput): ViewModel {
     blocks.push({
       kind: 'overview',
       html: renderMarkdown(parsed.overview),
-      metadocLine: (parsed.header?.line ?? 0) + 1,
       messages: [],
     });
     items.push({});
@@ -80,7 +77,6 @@ export function buildViewModel(input: ViewModelInput): ViewModel {
     blocks.push({
       kind: 'section',
       html: renderMarkdown(section.markdown),
-      metadocLine: section.anchorLine,
       symbol: section.symbol,
       hint: section.lines ? `${section.lines.start}-${section.lines.end}` : undefined,
       location: entry.location,
