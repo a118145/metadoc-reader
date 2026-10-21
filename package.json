@@ -1,0 +1,92 @@
+{
+  "name": "metadoc-reader",
+  "displayName": "Metadoc Reader",
+  "description": "Read source code side by side with its .metadoc description, aligned section by section with synchronized scrolling.",
+  "version": "0.1.0",
+  "publisher": "a118145",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/a118145/metadoc-reader.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "documentation",
+    "metadoc",
+    "code reading",
+    "side by side"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onWebviewPanel:metadocReader.view"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "metadocReader.open",
+        "title": "Open in Metadoc Reader",
+        "category": "Metadoc"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "metadocReader.open",
+          "when": "!explorerResourceIsFolder",
+          "group": "navigation@90"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "metadocReader.open",
+          "when": "resourceScheme == file",
+          "group": "navigation@90"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "metadocReader.open",
+          "when": "resourceScheme == file"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "metadocReader.open",
+          "when": "resourceScheme == file"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "markdown",
+        "extensions": [
+          ".metadoc"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc -p . --noEmit",
+    "compile-tests": "tsc -p tsconfig.test.json",
+    "test": "npm run compile-tests && cd out/test && node --test",
+    "package": "npm run build && vsce package --no-dependencies",
+    "vscode:prepublish": "npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "14.1.2",
+    "@types/node": "20.19.43",
+    "@types/vscode": "1.85.0",
+    "@vscode/vsce": "3.9.2",
+    "esbuild": "0.25.12",
+    "highlight.js": "11.11.2",
+    "markdown-it": "14.1.1",
+    "typescript": "5.9.3"
+  }
+}

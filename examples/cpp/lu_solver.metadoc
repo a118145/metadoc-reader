@@ -1,0 +1,62 @@
+<!-- metadoc:file version="0" source="lu_solver.cpp" -->
+# lu_solver.cpp
+
+Implementation of `linalg::LuSolver` (declared in `lu_solver.hpp`): solving
+dense linear systems `A x = b` by **LU decomposition with partial pivoting**.
+The factorization is computed once in `decompose`; afterwards every right-hand
+side costs only two triangular solves, and the determinant comes for free.
+
+This metadoc describes `lu_solver.cpp`, not the header that shares its stem —
+the `source` attribute in the header comment makes that explicit.
+
+<!-- metadoc:section lines="9-11" hash="ba8169db06ce" -->
+## Pivot tolerance
+
+File-local constant: a pivot whose magnitude is below `1e-12` is treated as
+zero, i.e. the matrix is declared singular instead of dividing by noise.
+
+<!-- metadoc:section symbol="linalg.LuSolver.LuSolver" lines="13-17" hash="1ae3c57032a7" -->
+## Constructor
+
+Takes the matrix by value and moves it into `lu_`, which is overwritten in place
+by the factorization. The permutation vector starts as the identity
+`0, 1, …, n−1`.
+
+<!-- metadoc:section symbol="linalg.LuSolver.decompose" lines="19-49" hash="df218b8e1617" -->
+## `decompose` — Doolittle elimination with partial pivoting
+
+For each column `k`:
+
+1. **Pivot search:** find the row `best ≥ k` with the largest `|a(i,k)|`.
+   Choosing the largest pivot bounds the multipliers by 1 and keeps rounding
+   errors small.
+2. **Singularity check:** if even that pivot is below the tolerance, record the
+   matrix as singular and stop.
+3. **Row swap:** exchange rows `k` and `best`, mirror the swap in `pivot_`, and
+   count it (each swap flips the determinant's sign).
+4. **Elimination:** for every row below, compute the multiplier
+   `l(i,k) = a(i,k) / a(k,k)`, store it where the eliminated zero would be, and
+   subtract `l(i,k) ×` row `k` from the rest of the row.
+
+Afterwards the strictly lower triangle holds `L` (unit diagonal implied) and the
+upper triangle holds `U`, with `P A = L U`. Cost: `≈ 2n³/3` flops.
+
+<!-- metadoc:section symbol="linalg.LuSolver.solve" lines="51-74" hash="82c1693b199d" -->
+## `solve` — two triangular solves
+
+Refuses to run on a singular factorization. Otherwise:
+
+- **Forward substitution** solves `L y = P b`; the permutation is applied on the
+  fly by reading `b[pivot_[i]]`. No division is needed because `L` has a unit
+  diagonal.
+- **Back substitution** solves `U x = y` from the last row upwards, reusing the
+  same vector for `y` and `x`. The loop `for (i = n; i-- > 0;)` is the idiomatic
+  way to count down with an unsigned index.
+
+Cost: `≈ 2n²` flops per right-hand side.
+
+<!-- metadoc:section symbol="linalg.LuSolver.determinant" lines="76-85" hash="e7b51b63fac6" -->
+## `determinant`
+
+`det(A) = (−1)^swaps · ∏ u(i,i)`: the product of `U`'s diagonal, with the sign
+flipped once per row exchange. A singular matrix returns exactly `0`.
