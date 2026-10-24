@@ -37,11 +37,17 @@ Requirements: VS Code 1.85 or newer. Node.js 22+ and npm are needed only to buil
 
 ### From a `.vsix`
 
+Download `metadoc-reader-<version>.vsix` from the
+[latest release](https://github.com/a118145/metadoc-reader/releases/latest), then install it:
+
 ```sh
 code --install-extension metadoc-reader-0.1.0.vsix
 ```
 
 You can also run **Extensions: Install from VSIX...** from the command palette.
+
+The extension is not listed on the Visual Studio Marketplace, so VS Code does not update it. To
+update, download the newer `.vsix` and install it the same way.
 
 ### From source
 
@@ -100,6 +106,12 @@ npm run typecheck   # strict TypeScript check of the extension and the webview
 npm run build       # bundles dist/extension.js and dist/webview.js with esbuild
 npm run package     # produces the .vsix
 ```
+
+To cut a release: bump `version` in `package.json`, add a `## <version>` entry to `CHANGELOG.md`,
+commit, and push the tag `v<version>` (for example `git tag v0.2.0 && git push origin v0.2.0`). The
+[release workflow](.github/workflows/release.yml) checks that the tag matches `package.json`,
+runs the type check and the tests, packages the `.vsix` and attaches it to a GitHub Release whose
+notes are taken from that `CHANGELOG.md` entry.
 
 Layout:
 
